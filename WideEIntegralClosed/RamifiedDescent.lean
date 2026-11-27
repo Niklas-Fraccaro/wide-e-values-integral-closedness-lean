@@ -123,11 +123,11 @@ private theorem evaluateWide_of_mem_pointIdeal (F : RamifiedFundamental frame so
 
 end RamifiedFundamental
 
-/-- Sections 1–5 under the arithmetic Frobenius-frame existence statement from the paper. -/
-theorem isIntegrallyClosed_valueSubring_of_broadArithmeticFrames_and_division
-    (frames : BroadArithmeticFrameExistence) (division : HasWideDivisionAtOne) :
-    IsIntegrallyClosed WideE.valueSubring := by
-  apply isIntegrallyClosed_valueSubring_of_realizedSpecializations division
+/-- Each finite family specializes through the actual smooth normal component of its fiber. -/
+theorem realizedSmoothSpecializations_of_broadArithmeticFrames
+    (frames : BroadArithmeticFrameExistence) :
+    ∀ {ι : Type} [Finite ι] (f : ι → wideFunctions),
+      Nonempty (RealizedSmoothNormalSpecialization evaluateAtOne wideParameter f) := by
   intro ι _ f
   obtain ⟨d, frame, solutions, hsolutions, entries⟩ := frames (fun i => (f i).val) (fun i => (f i).property)
   obtain ⟨F⟩ := frame.exists_ramifiedFundamental solutions hsolutions
@@ -166,15 +166,26 @@ theorem isIntegrallyClosed_valueSubring_of_broadArithmeticFrames_and_division
     apply Subtype.ext
     change F.evaluateAtOne (F.solutionInCandidate (row i) (col i)) = (f i).val 1
     rw [F.evaluateAtOne_solution, hentries i]
-  have specialization : Nonempty (NormalSpecialization («k» := ↥k)
+  have specialization : Nonempty (SmoothNormalSpecialization («k» := ↥k)
       (realize wideParameter) (realize ∘ f) (evaluateAtOne ∘ f)) := by
     rw [ht]
-    exact normalSpecialization_of_matrixPVFiber δ D M U hbase hode hu simple constants
+    exact smoothNormalSpecialization_of_matrixPVFiber δ D M U hbase hode hu simple constants
       formalBaseEmbedding_injective (laurentLogBasePointIdeal k) residueEquiv
       t (parameter_mem_pointIdeal F.degree) (realize ∘ f) hf (evaluateAtOne ∘ f)
       F.evaluateWide F.evaluateWide_of_mem_pointIdeal heval
   obtain ⟨data⟩ := specialization
   letI : Algebra WideE.AlgebraicComplex L := (inferInstance : Algebra ↥k L)
   exact ⟨⟨L, realize, data⟩⟩
+
+/-- Sections 1–5 under the arithmetic Frobenius-frame existence statement from the paper. -/
+theorem isIntegrallyClosed_valueSubring_of_broadArithmeticFrames_and_division
+    (frames : BroadArithmeticFrameExistence) (division : HasWideDivisionAtOne) :
+    IsIntegrallyClosed WideE.valueSubring := by
+  apply isIntegrallyClosed_valueSubring_of_realizedSpecializations division
+  intro ι _ f
+  obtain ⟨data⟩ := realizedSmoothSpecializations_of_broadArithmeticFrames frames f
+  letI := data.commRing
+  letI := data.algebra
+  exact ⟨⟨data.ambient, data.realize, data.specialization.toNormalSpecialization⟩⟩
 
 end WideEIntegralClosed

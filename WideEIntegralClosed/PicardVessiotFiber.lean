@@ -1,5 +1,5 @@
 import WideEIntegralClosed.FiberBaseChange
-import WideEIntegralClosed.HopfNormality
+import WideEIntegralClosed.HopfComponentSmoothness
 import AlgebraicFiber
 import CandidateFaithfullyFlat
 import MatrixCandidateTorsorCriterion
@@ -80,15 +80,15 @@ theorem matrixPVGroup_isReduced [IsDomain R] [CharZero R]
 
 set_option maxRecDepth 1500 in
 include M hbase hode hdet simple constants in
-/-- Specialization of a matrix PV algebra through the normal component selected by evaluation. -/
-theorem normalSpecialization_of_matrixPVFiber [IsDomain R] [CharZero R] [CharZero k]
+/-- Specialization through the actual smooth normal component selected by evaluation. -/
+theorem smoothNormalSpecialization_of_matrixPVFiber [IsDomain R] [CharZero R] [CharZero k]
     {S ι : Type} [CommRing S] [IsDomain S] [Algebra k S]
     (hinjective : Function.Injective (algebraMap R L))
     (I : Ideal R) (residue : (R ⧸ I) ≃ₐ[R] k)
     (t : R) (ht : t ∈ I) (f : ι → L) (hf : ∀ i, f i ∈ P) (x : ι → S)
     (eval : P →ₐ[k] S) (hvanishes : ∀ a ∈ I, eval (algebraMap R P a) = 0)
     (heval : ∀ i, eval ⟨f i, hf i⟩ = x i) :
-    Nonempty (NormalSpecialization (k := k) (algebraMap R L t) f x) := by
+    Nonempty (SmoothNormalSpecialization (k := k) (algebraMap R L t) f x) := by
   let functions := P
   let H := matrixPVGroup dR dL M U hbase hode
   letI : HopfAlgebra k H := matrixPVHopf dR dL M U hbase hode hdet simple constants
@@ -102,7 +102,7 @@ theorem normalSpecialization_of_matrixPVFiber [IsDomain R] [CharZero R] [CharZer
     have hj : J ≤ RingHom.ker eval.toRingHom := Ideal.map_le_iff_le_comap.mpr hvanishes
     exact fun _ ha => hj ha)
   let inversion : H →ₐ[k] H := WideE.hopfAntipodeAlgHom k H
-  refine normalSpecialization_of_hopfFiberMap (functions.restrictScalars k) (algebraMap R L t)
+  refine smoothNormalSpecialization_of_hopfFiberMap (functions.restrictScalars k) (algebraMap R L t)
     (functions.algebraMap_mem t) f hf x (e.toAlgHom.comp q) (quotientEval.comp e.symm.toAlgHom)
     ?_ ?_ inversion WideE.hopfAntipodeAlgHom_toLinearMap
   · have hq : q (algebraMap R P t) = 0 :=
@@ -113,5 +113,19 @@ theorem normalSpecialization_of_matrixPVFiber [IsDomain R] [CharZero R] [CharZer
     let a : P := ⟨f i, hf i⟩
     have h : e.symm.toAlgHom (e.toAlgHom (q a)) = q a := e.symm_apply_apply (q a)
     exact (congrArg quotientEval h).trans (heval i)
+
+include M hbase hode hdet simple constants in
+/-- The smooth specialization supplies the normal-domain data used in descent. -/
+theorem normalSpecialization_of_matrixPVFiber [IsDomain R] [CharZero R] [CharZero k]
+    {S ι : Type} [CommRing S] [IsDomain S] [Algebra k S]
+    (hinjective : Function.Injective (algebraMap R L))
+    (I : Ideal R) (residue : (R ⧸ I) ≃ₐ[R] k)
+    (t : R) (ht : t ∈ I) (f : ι → L) (hf : ∀ i, f i ∈ P) (x : ι → S)
+    (eval : P →ₐ[k] S) (hvanishes : ∀ a ∈ I, eval (algebraMap R P a) = 0)
+    (heval : ∀ i, eval ⟨f i, hf i⟩ = x i) :
+    Nonempty (NormalSpecialization (k := k) (algebraMap R L t) f x) := by
+  obtain ⟨data⟩ := smoothNormalSpecialization_of_matrixPVFiber
+    dR dL M U hbase hode hdet simple constants hinjective I residue t ht f hf x eval hvanishes heval
+  exact ⟨data.toNormalSpecialization⟩
 
 end WideEIntegralClosed

@@ -16,9 +16,14 @@ The verified descent theorem is
 
 The arithmetic Frobenius input supplies rational exponents and broad
 E-function amplitudes for any finite family. Lean verifies the construction
-of a common frame from individual frames by block diagonals. The proof of
-individual frame existence is in progress. The paper derives this input from
+of a common frame from individual frames by block diagonals. The paper derives this input from
 [Lepetit, Proposition 16 and Theorem 7](https://nwejm.univ-lille.fr/index.php/nwejm/article/view/23).
+
+The working proof of the unconditional theorem is in
+[IntegralClosedness.lean](WideEIntegralClosed/IntegralClosedness.lean). Its
+end-to-end build and axiom audit are pending. The default build and its
+ten-declaration audit passed locally for the conditional theorem.
+See the [original proof note (German, PDF)](Ganzabgeschlossenheit_E_Wertring.pdf).
 
 The proof specializes a ramified Picard–Vessiot algebra at the ordinary point
 `(1, 0)` of the Laurent–logarithm base. Evaluation selects a normal component
@@ -57,6 +62,13 @@ lake exe cache get
 The optional entry point `WideEIntegralClosed.Main` imports the division
 proof from the pinned WideE library and leaves the Frobenius input as a
 hypothesis.
+
+The pending full check builds the unconditional theorem and audits its
+transitive axioms.
+
+```sh
+./build.sh build +WideEIntegralClosed.FullAudit
+```
 
 ## Verification
 
