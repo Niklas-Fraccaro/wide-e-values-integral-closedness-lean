@@ -1,0 +1,11 @@
+name = "wideEIntegralClosed"
+version = "0.1.0"
+defaultTargets = ["WideEIntegralClosed"]
+
+[[require]]
+name = "wideE"
+git = "https://github.com/Niklas-Fraccaro/wide-e-values-lean.git"
+rev = "cfa133640c1100e3dae4fecf6d8aa3d132542285"
+
+[[lean_lib]]
+name = "WideEIntegralClosed"
