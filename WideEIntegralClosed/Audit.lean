@@ -1,7 +1,9 @@
-import WideEIntegralClosed
+import WideEIntegralClosed.Factorization
+import WideEIntegralClosed.FrameAssembly
+import WideEIntegralClosed.RamifiedDescent
 import Lean.Util.CollectAxioms
 
-/-! An axiom audit for the checked proof endpoints. -/
+/-! An axiom audit for the conditional proof endpoints. -/
 
 open Lean Elab Command
 

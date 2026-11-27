@@ -28,11 +28,24 @@ private theorem geometricBinomial_of_subfactorial
   rw [← hq]
   exact binomialPrefixDenominators_ratCast q
 
+private theorem broadRetainedFourierDenominators_of_factorialLogDenominators {m n : ℕ}
+    (A : Fin (m + 1) → Fin (n + 1) → WideE.AlgebraicComplex) (hf : Stage56FiniteFuchs A)
+    (h : ∀ i : frobeniusRootSeedIndex (sameFourierEulerCoefficientSymbols A hf 0),
+      HasSubfactorialFactorialLogDenominators (sameFourierTwistedAmplitude A hf i)) :
+    BroadRetainedFourierDenominators A hf := by
+  intro i ε hε
+  obtain ⟨B, hB, hprefix⟩ := h i ε hε
+  choose D hD hDB hCoeffs using hprefix
+  refine ⟨B, hB, D, hD, hDB, fun m j hj => ?_⟩
+  have hi := (hCoeffs m j hj 0).map (algebraicClosure ℚ ℂ).val.toIntAlgHom
+  simpa only [logAmplitudeFactorialCoefficient, map_mul, map_natCast,
+    RingHom.toIntAlgHom_apply, mul_assoc] using hi
+
 /-- The selected source and its finite Laurent forcing extensions supply the broad denominator
 bound for the actual retained Fourier log-free coefficients. -/
 theorem hasBroadRetainedFourierDenominators : HasBroadRetainedFourierDenominators := by
   classical
-  intro f a C expansion
+  intro f a C expansion S
   let F := C.coefficientField
   letI : NumberField F := C.numberField
   letI : IsAlgClosed WideE.AlgebraicComplex := IsAlgClosure.isAlgClosed ℚ
@@ -40,7 +53,6 @@ theorem hasBroadRetainedFourierDenominators : HasBroadRetainedFourierDenominator
   let n := C.rankMinusOne
   let t := C.clearingPolynomial
   let U := C.clearingMatrix
-  let S := C.source expansion
   let A : Fin (S.order + 1) → Fin (S.fourierOrder + 1) → WideE.AlgebraicComplex := S.reciprocalArray
   let hf : Stage56FiniteFuchs A := S.fourier_equations.2.1
   have hc := S.fourier_equations.2.2.1
@@ -101,16 +113,11 @@ theorem hasBroadRetainedFourierDenominators : HasBroadRetainedFourierDenominator
       have hBack := hShift.shift (-z)
       rw [frobeniusIntegerShift_add, neg_add_cancel] at hBack
       simpa only [frobeniusIntegerShift, HahnSeries.single_zero_one, map_one, one_mul] using hBack
-  intro i ε hε
-  have hMapped : HasSubfactorialFactorialLogDenominators (p (e i)) := by
-    rw [← hpE (e i)]
-    exact (hArithmetic (e i)).map χ
-  obtain ⟨B, hB, hprefix⟩ := hMapped ε hε
-  choose D hD hDB hCoeffs using hprefix
-  refine ⟨B, hB, D, hD, hDB, fun m j hj => ?_⟩
-  have hi := (hCoeffs m j hj 0).map (algebraicClosure ℚ ℂ).val.toIntAlgHom
-  simpa only [p, Equiv.symm_apply_apply, logAmplitudeFactorialCoefficient, map_mul, map_natCast,
-    RingHom.toIntAlgHom_apply, mul_assoc] using hi
+  refine broadRetainedFourierDenominators_of_factorialLogDenominators A hf ?_
+  intro i
+  have h := (hArithmetic (e i)).map χ
+  rw [hpE (e i)] at h
+  simpa only [p, Equiv.symm_apply_apply] using h
 
 /-- The broad arithmetic Frobenius frames of the paper exist for every finite family. -/
 theorem broadArithmeticFrameExistence : BroadArithmeticFrameExistence :=

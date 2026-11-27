@@ -30,14 +30,16 @@ jobs:
         run: |
           lean --version
           log="$RUNNER_TEMP/wide-e-integral-closed.log"
-          ./build.sh build WideEIntegralClosed +WideEIntegralClosed.Audit 2>&1 | tee "$log"
+          ./build.sh build WideEIntegralClosed +WideEIntegralClosed.Audit \
+            +WideEIntegralClosed.FullAudit 2>&1 | tee "$log"
           if grep -F "declaration uses 'sorry'" "$log"; then
             exit 1
           fi
-          audit=$(grep -oE 'Checked the axioms of [0-9]+ declarations\.' "$log")
+          conditional_audit=$(grep -oE 'Checked the axioms of [0-9]+ declarations\.' "$log")
+          full_audit=$(grep -oE 'Checked the axioms of [0-9]+ declarations in the unconditional proof\.' "$log")
           git diff --exit-code -- lean-toolchain lake-manifest.json
           {
             printf '## Lean verification\n\n'
             printf 'Commit `%s` passed with `%s`.\n\n' "$GITHUB_SHA" "$(cat lean-toolchain)"
-            printf '%s\n' "$audit"
+            printf '%s\n' "$conditional_audit" "$full_audit"
           } >> "$GITHUB_STEP_SUMMARY"

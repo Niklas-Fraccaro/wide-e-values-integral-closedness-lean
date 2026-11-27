@@ -1,3 +1,4 @@
 import WideEIntegralClosed.Factorization
 import WideEIntegralClosed.FrameAssembly
 import WideEIntegralClosed.RamifiedDescent
+import WideEIntegralClosed.IntegralClosedness
